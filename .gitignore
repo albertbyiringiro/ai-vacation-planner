@@ -1,0 +1,26 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Secrets and local state
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite3
+
+# Vector store / local data
+chroma_db/
+.chroma/
+
+# Editor / OS / tool-local
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json
