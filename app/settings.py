@@ -5,6 +5,8 @@ from fastapi import Depends
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+AppEnv = Literal["development", "test", "production"]
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -12,8 +14,10 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_ignore_empty=True,
     )
-    app_env: Literal["development", "test", "production"] = "development"
+    app_env: AppEnv = "development"
+    database_url: str = "sqlite:///./vacation.db"
     anthropic_api_key: SecretStr | None = None
+    jwt_secret: SecretStr | None = None
 
 
 @lru_cache
