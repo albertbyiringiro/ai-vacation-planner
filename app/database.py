@@ -8,6 +8,10 @@ from sqlalchemy.pool import ConnectionPoolEntry
 
 from app.settings import get_settings
 
+# Every constraint gets a predictable name, which Alembic needs to alter or drop it later
+# (SQLAlchemy docs: constraint naming conventions). Check constraints must be named explicitly.
+# The docs' sample uses column_0_name; column_0_N_name (supported by the installed sqlalchemy,
+# see sql/naming.py) joins all columns, so UNIQUE(itinerary_id, number) is not named after one.
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_N_label)s",
     "uq": "uq_%(table_name)s_%(column_0_N_name)s",
@@ -40,12 +44,16 @@ def _enable_sqlite_foreign_keys(
         dbapi_connection.autocommit = previous
 
 
-def make_engine(url: str) -> Engine:
+def make_engine(url: str, *, foreign_keys: bool = True) -> Engine:
     if not url.startswith("sqlite"):
-        raise ValueError(f"Only SQLite URLs are supported, got: {url.split(':', 1)[0]}")
-
+        raise ValueError(
+            f"Only SQLite URLs are supported (ADR 0001), got: {url.split(':', 1)[0]}"
+        )
+    # autocommit=False makes the sqlite3 driver (3.12+) use real transactions: without it DDL and
+    # SAVEPOINT are not rolled back with their transaction.
     engine = create_engine(url, connect_args={"autocommit": False})
-    event.listen(engine, "connect", _enable_sqlite_foreign_keys)
+    if foreign_keys:
+        event.listen(engine, "connect", _enable_sqlite_foreign_keys)
     return engine
 
 
