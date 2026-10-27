@@ -2,6 +2,8 @@ from pwdlib import PasswordHash
 
 _password_hash = PasswordHash.recommended()
 
+JWT_ALGORITHM = "HS256"
+
 
 def hash_password(password: str) -> str:
     return _password_hash.hash(password)
