@@ -3,7 +3,8 @@ from typing import Literal
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.settings import AppEnv, SettingsDep
+from app.dependencies import SettingsDep
+from app.settings import AppEnv
 
 router = APIRouter(tags=["health"])
 

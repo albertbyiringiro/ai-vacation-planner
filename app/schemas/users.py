@@ -15,6 +15,11 @@ PASSWORD_MAX_LENGTH = 128
 SERVICE_NAME = "vacationplanner"
 
 
+def normalise_email(email: str) -> str:
+    """Canonical form used for storage and lookup."""
+    return email.strip().lower()
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(
@@ -25,7 +30,7 @@ class UserCreate(BaseModel):
     @field_validator("email")
     @classmethod
     def lowercase_email(cls, email: str) -> str:
-        return email.lower()
+        return normalise_email(email)
 
     @field_validator("password", mode="before")
     @classmethod

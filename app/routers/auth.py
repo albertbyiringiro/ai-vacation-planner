@@ -1,9 +1,19 @@
-from fastapi import APIRouter, HTTPException
+from datetime import timedelta
+from typing import Annotated
 
-from app.dependencies import DBSession
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+
+from app.dependencies import CurrentUser, DBSession, SettingsDep
 from app.models import User
+from app.schemas.auth import TokenResponse
 from app.schemas.users import UserCreate, UserRead
-from app.services.users import EmailAlreadyRegistered, register_user
+from app.security import create_access_token
+from app.services.users import (
+    EmailAlreadyRegistered,
+    authenticate_user,
+    register_user,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -16,3 +26,30 @@ def register(data: UserCreate, db: DBSession) -> User:
         raise HTTPException(
             status_code=409, detail="Email already registered"
         ) from error
+
+
+@router.post("/login", response_model=TokenResponse)
+def login(
+    form: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: DBSession,
+    settings: SettingsDep,
+) -> TokenResponse:
+    """OAuth2 password flow: the form's `username` field carries the email."""
+    user = authenticate_user(db, form.username, form.password)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = create_access_token(
+        user.id,
+        secret=settings.jwt_secret.get_secret_value(),
+        expires_in=timedelta(minutes=settings.access_token_expire_minutes),
+    )
+    return TokenResponse(access_token=token, token_type="bearer")
+
+
+@router.get("/me", response_model=UserRead)
+def me(user: CurrentUser) -> User:
+    return user
