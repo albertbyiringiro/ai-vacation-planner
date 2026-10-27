@@ -1,0 +1,49 @@
+@baseUrl = http://localhost:8000
+@email = login-demo@example.com
+@password = a-long-enough-password
+
+### 201 (first send) / 409 (after) - make sure the demo user exists
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### 200 - logs in; the form field `username` carries the email
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{email}}&password={{password}}
+
+### 200 - email is case-insensitive
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=LOGIN-DEMO@example.com&password={{password}}
+
+### 401 - wrong password
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{email}}&password=this-is-the-wrong-password
+
+### 401 - unknown email (same response as a wrong password)
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=nobody@example.com&password={{password}}
+
+### 401 - password longer than 128 characters
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{email}}&password=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+### 422 - missing password
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{email}}
