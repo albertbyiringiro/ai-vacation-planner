@@ -1,10 +1,10 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.dependencies import CurrentUser, DBSession, SettingsDep
+from app.dependencies import DBSession, SettingsDep
 from app.models import User
 from app.schemas.auth import TokenResponse
 from app.schemas.users import UserCreate, UserRead
@@ -31,6 +31,7 @@ def register(data: UserCreate, db: DBSession) -> User:
 @router.post("/login", response_model=TokenResponse)
 def login(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
+    response: Response,
     db: DBSession,
     settings: SettingsDep,
 ) -> TokenResponse:
@@ -42,14 +43,11 @@ def login(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["Pragma"] = "no-cache"
     token = create_access_token(
         user.id,
         secret=settings.jwt_secret.get_secret_value(),
         expires_in=timedelta(minutes=settings.access_token_expire_minutes),
     )
     return TokenResponse(access_token=token, token_type="bearer")
-
-
-@router.get("/me", response_model=UserRead)
-def me(user: CurrentUser) -> User:
-    return user

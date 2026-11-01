@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.routers import auth, health
+from app.routers import auth, health, users
 from app.settings import get_settings
 
 
@@ -20,6 +20,7 @@ app = FastAPI(title="AI Vacation Planner", lifespan=lifespan)
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(users.router)
 
 
 @app.exception_handler(RequestValidationError)
