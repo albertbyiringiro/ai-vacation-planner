@@ -24,10 +24,10 @@ class Trip(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     destination: Mapped[str]
     days: Mapped[int]
-    budget: Mapped[int]  # whole US dollars
+    budget: Mapped[int]  # whole US dollars (GLOSSARY: Budget)
     trip_style: Mapped[str]
 
     owner: Mapped[User] = relationship(back_populates="trips")
