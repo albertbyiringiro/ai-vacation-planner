@@ -13,6 +13,10 @@ class TripCreate(BaseModel):
     trip_style: str = Field(min_length=1, max_length=50)
 
 
+class TripUpdate(TripCreate):
+    """PUT replaces the whole Trip, so every field is required, exactly as on create."""
+
+
 class TripRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
