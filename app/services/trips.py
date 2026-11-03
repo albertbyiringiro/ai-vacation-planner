@@ -27,8 +27,5 @@ def list_trips(db: Session, owner_id: int, *, limit: int, offset: int) -> list[T
 
 
 def get_owned_trip(db: Session, owner_id: int, trip_id: int) -> Trip | None:
-    """The Trip if it exists AND belongs to owner_id; None for a missing and a foreign Trip alike.
-
-    Every route that takes a trip id goes through here (OWASP API1:2023, object-level authorization),
-    so there is one place that decides ownership."""
+    """The Trip if it exists AND belongs to owner_id; None for a missing and a foreign Trip alike."""
     return db.scalar(select(Trip).where(Trip.id == trip_id, Trip.owner_id == owner_id))

@@ -15,8 +15,6 @@ TripId = Annotated[int, Path(ge=1, le=SQLITE_MAX_INT)]
 
 
 def trip_not_found() -> HTTPException:
-    # One response for a missing Trip and for someone else's Trip: RFC 9110 15.5.4 allows 404 to
-    # hide that a resource exists (ADR 0005).
     return HTTPException(status_code=404, detail="Trip not found")
 
 
