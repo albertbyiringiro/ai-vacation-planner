@@ -1,7 +1,9 @@
 import sqlite3
 from collections.abc import Iterator
 from functools import lru_cache
+from typing import Annotated
 
+from fastapi import Path
 from sqlalchemy import (
     Engine,
     MetaData,
@@ -16,6 +18,10 @@ from sqlalchemy.orm import (
 from sqlalchemy.pool import ConnectionPoolEntry
 
 from app.settings import get_settings
+
+# SQLite integers are 64-bit: a larger id or offset would raise OverflowError (a 500).
+SQLITE_MAX_INT = 2**63 - 1
+TripId = Annotated[int, Path(ge=1, le=SQLITE_MAX_INT)]
 
 # Every constraint gets a predictable name, which Alembic needs to alter or drop it later
 # (SQLAlchemy docs: constraint naming conventions). Check constraints must be named explicitly.
