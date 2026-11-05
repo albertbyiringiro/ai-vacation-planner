@@ -9,7 +9,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.database import SQLITE_MAX_INT
+from app.routers.trips import SQLITE_MAX_INT
 from app.schemas.text import reject_nul
 from app.schemas.trips import MAX_TRIP_DAYS
 

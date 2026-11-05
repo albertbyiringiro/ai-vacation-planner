@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.dependencies import DBSession, SettingsDep
+from app.dependencies import DbSession, SettingsDep
 from app.models import User
 from app.schemas.auth import TokenResponse
 from app.schemas.users import UserCreate, UserRead
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", status_code=201, response_model=UserRead)
-def register(data: UserCreate, db: DBSession) -> User:
+def register(data: UserCreate, db: DbSession) -> User:
     try:
         return register_user(db, data)
     except EmailAlreadyRegistered as error:
@@ -32,7 +32,7 @@ def register(data: UserCreate, db: DBSession) -> User:
 def login(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
-    db: DBSession,
+    db: DbSession,
     settings: SettingsDep,
 ) -> TokenResponse:
     """OAuth2 password flow: the form's `username` field carries the email."""

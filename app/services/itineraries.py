@@ -1,6 +1,6 @@
 from sqlite3 import IntegrityError
 
-from app.dependencies import DBSession
+from app.dependencies import DbSession
 from app.models import Activity, Day, Itinerary, Trip
 from app.schemas.itineraries import DayData, ItineraryCreate, ItineraryRead
 
@@ -20,9 +20,9 @@ class TripVanished(Exception):
     """The Trip was deleted (by another request) between the lookup"""
 
 
-def create_itinerary(db: DBSession, trip: Trip, data: ItineraryCreate) -> ItineraryRead:
+def create_itinerary(db: DbSession, trip: Trip, data: ItineraryCreate) -> ItineraryRead:
     for day in data.days:
-        if day > trip.days:
+        if day.day > trip.days:
             raise DayBeyondTrip(day.day, trip.days)
 
     itinerary = Itinerary(trip_id=trip.id)
