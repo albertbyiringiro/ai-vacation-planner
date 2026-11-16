@@ -19,16 +19,16 @@ Content-Type: application/x-www-form-urlencoded
 username={{email}}&password={{password}}
 
 ### 200 - the current user (send the login request above first)
-GET {{baseUrl}}/auth/me
+GET {{baseUrl}}/users/me
 Authorization: Bearer {{login.response.body.access_token}}
 
 ### 401 - no Authorization header
-GET {{baseUrl}}/auth/me
+GET {{baseUrl}}/users/me
 
 ### 401 - garbage token
-GET {{baseUrl}}/auth/me
+GET {{baseUrl}}/users/me
 Authorization: Bearer not-a-real-token
 
 ### 401 - wrong scheme
-GET {{baseUrl}}/auth/me
+GET {{baseUrl}}/users/me
 Authorization: Basic dXNlcjpwYXNz

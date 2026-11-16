@@ -38,7 +38,7 @@ def test_login_and_me(client):
     assert response.json()["token_type"] == "bearer"
 
     me = client.get(
-        "/auth/me",
+        "/users/me",
         headers={"Authorization": f"Bearer {response.json()['access_token']}"},
     )
     assert me.status_code == 200
@@ -59,8 +59,8 @@ def test_login_rejects_oversized_password(client):
 
 
 def test_me_requires_valid_token(client):
-    assert client.get("/auth/me").status_code == 401
-    bad = client.get("/auth/me", headers={"Authorization": "Bearer nope"})
+    assert client.get("/users/me").status_code == 401
+    bad = client.get("/users/me", headers={"Authorization": "Bearer nope"})
     assert bad.status_code == 401
     assert bad.headers["www-authenticate"] == "Bearer"
 
@@ -72,5 +72,5 @@ def test_token_for_deleted_user_is_rejected(client, db_session):
     token = login(client).json()["access_token"]
     db_session.delete(db_session.get(User, 1))
     db_session.commit()
-    response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 401
