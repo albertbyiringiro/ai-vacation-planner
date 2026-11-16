@@ -20,22 +20,21 @@ class Usage:
     cache_read_input_tokens: int = 0
     cache_creation_input_tokens: int = 0
     thinking_tokens: int | None = None
+    service_tier: str | None = None
+    inference_geo: str | None = None
 
 
 @dataclass(frozen=True)
 class LLMResponse:
     text: str
-    model: str  # the model that answered, as reported by the provider
+    model: str
     usage: Usage
-    stop_reason: str | None  # "end_turn", "max_tokens" (truncated), "refusal", ...
-    request_id: str | None = None  # quote this when reporting a problem to the provider
+    stop_reason: str | None
+    request_id: str | None = None
 
 
 @runtime_checkable
 class LLMClient(Protocol):
-    """Arguments are passed through to the provider unvalidated: an empty `messages` list or a
-    non-positive `max_tokens` is the provider's 400, which `complete` lets propagate."""
-
     def complete(
         self,
         messages: Sequence[Message],
