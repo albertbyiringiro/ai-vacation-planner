@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from app.llm.http import register_llm_error_handlers
 from app.routers import auth, health, trips, users
 from app.settings import get_settings
 
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None, None]:
 
 app = FastAPI(title="AI Vacation Planner", lifespan=lifespan)
 
+register_llm_error_handlers(app)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(users.router)
