@@ -123,7 +123,8 @@ def test_build_applies_model_timeout_and_retries():
         )
     )
     assert client.default_model == "m1"
-    assert client._sdk.timeout == 12
+    assert client._sdk.timeout.read == 12
+    assert client._sdk.timeout.connect == 5
     assert client._sdk.max_retries == 4
 
 
