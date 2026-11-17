@@ -1,0 +1,196 @@
+{
+  "info": {
+    "name": "AI Vacation Planner",
+    "description": "Every route so far. Run in order: Auth > Register, Auth > Login (saves the token), Trips > Create trip (saves trip_id), then anything else. Works in Postman and Insomnia (import this file).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "email", "value": "demo@example.com" },
+    { "key": "password", "value": "a-long-enough-password" },
+    { "key": "token", "value": "" },
+    { "key": "trip_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "description": "201 on first send, 409 if the email is already registered. Password: 15 to 128 characters."
+          }
+        },
+        {
+          "name": "Login (saves token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "{{email}}", "type": "text" },
+                { "key": "password", "value": "{{password}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "description": "OAuth2 password form: the `username` field carries the email. Stores access_token in the `token` collection variable."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/me", "host": ["{{baseUrl}}"], "path": ["users", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "Create trip (saves trip_id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('trip_id', String(pm.response.json().id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Paris\",\n  \"days\": 3,\n  \"budget\": 1500,\n  \"trip_style\": \"budget\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/trips", "host": ["{{baseUrl}}"], "path": ["trips"] },
+            "description": "days 1-60, budget 0-1,000,000. Unknown fields are rejected."
+          }
+        },
+        {
+          "name": "List trips",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/trips?limit=50&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips"],
+              "query": [
+                { "key": "limit", "value": "50", "description": "1-100" },
+                { "key": "offset", "value": "0" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get trip",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/trips/{{trip_id}}", "host": ["{{baseUrl}}"], "path": ["trips", "{{trip_id}}"] }
+          }
+        },
+        {
+          "name": "Update trip (full replace)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Lisbon\",\n  \"days\": 4,\n  \"budget\": 2000,\n  \"trip_style\": \"relaxed\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/trips/{{trip_id}}", "host": ["{{baseUrl}}"], "path": ["trips", "{{trip_id}}"] },
+            "description": "Every field required. 409 if the new day count is shorter than the itinerary."
+          }
+        },
+        {
+          "name": "Delete trip",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/trips/{{trip_id}}", "host": ["{{baseUrl}}"], "path": ["trips", "{{trip_id}}"] },
+            "description": "204 on success."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Itineraries",
+      "item": [
+        {
+          "name": "Create itinerary",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trip_id\": {{trip_id}},\n  \"days\": [\n    { \"day\": 1, \"activities\": [\"Eiffel Tower\", \"Seine River walk\"] },\n    { \"day\": 2, \"activities\": [\"Louvre Museum\"] }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/itineraries", "host": ["{{baseUrl}}"], "path": ["itineraries"] },
+            "description": "409 if the trip already has one. 422 if a day number exceeds the trip's days. 1-20 activities per day, unique day numbers."
+          }
+        },
+        {
+          "name": "Get itinerary",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/itineraries/{{trip_id}}", "host": ["{{baseUrl}}"], "path": ["itineraries", "{{trip_id}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}

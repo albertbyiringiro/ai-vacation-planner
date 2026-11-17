@@ -33,10 +33,10 @@ class Settings(BaseSettings):
     # At most a week: without a bound a huge value starts fine and overflows at the first login.
     access_token_expire_minutes: int = Field(default=30, gt=0, le=10080)
     anthropic_api_key: SecretStr | None = None  # needed by the LLM client (app/llm)
-    # The default model for LLM calls. Lower-case model IDs only, e.g. claude-sonnet-5-5; the live
+    # The default model for LLM calls. Lower-case model IDs only, e.g. claude-haiku-5-5; the live
     # tests pick their own cheaper model.
     llm_model: str = Field(
-        default="claude-sonnet-5-5", pattern=r"^[a-z0-9][a-z0-9.-]{0,99}$"
+        default="claude-haiku-5-5", pattern=r"^[a-z0-9][a-z0-9.-]{0,99}$"
     )
     # Optional: send API calls through a proxy or gateway instead of api.anthropic.com.
     anthropic_base_url: str | None = None

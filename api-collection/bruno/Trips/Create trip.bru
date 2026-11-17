@@ -1,0 +1,30 @@
+meta {
+  name: Create trip
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/trips
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "destination": "Paris",
+    "days": 3,
+    "budget": 1500,
+    "trip_style": "budget"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("trip_id", res.body.id);
+  }
+}
+
+docs {
+  days 1-60, budget 0-1,000,000. Unknown fields are rejected. Saves the new id as `trip_id`.
+}

@@ -31,6 +31,10 @@ class Price:
 
 
 PRICES: dict[str, Price] = {
+    # Cache write 1.25x and read 0.1x the input rate.
+    "claude-haiku-4-5": Price(
+        Rates(input=1.0, cache_write=1.25, cache_read=0.10, output=5.0)
+    ),
     "claude-sonnet-5-5": Price(
         Rates(input=2.0, cache_write=2.5, cache_read=0.10, output=10.0)
     ),

@@ -1,0 +1,11 @@
+meta {
+  name: Get trip
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/trips/{{trip_id}}
+  body: none
+  auth: inherit
+}

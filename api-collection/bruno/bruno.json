@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "AI Vacation Planner",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}

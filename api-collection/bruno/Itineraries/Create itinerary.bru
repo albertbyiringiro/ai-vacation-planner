@@ -1,0 +1,25 @@
+meta {
+  name: Create itinerary
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/itineraries
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "trip_id": {{trip_id}},
+    "days": [
+      { "day": 1, "activities": ["Eiffel Tower", "Seine River walk"] },
+      { "day": 2, "activities": ["Louvre Museum"] }
+    ]
+  }
+}
+
+docs {
+  409 if the trip already has one. 422 if a day number exceeds the trip's days. 1-20 activities per day, unique day numbers.
+}

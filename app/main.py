@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -12,7 +12,7 @@ from app.settings import get_settings
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     get_settings()
     yield
 
