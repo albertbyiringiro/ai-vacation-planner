@@ -10,7 +10,7 @@ from app.security import InvalidToken, decode_access_token
 from app.settings import Settings, get_settings
 
 bearer_scheme = HTTPBearer(auto_error=False)
-DBSession = Annotated[Session, Depends(get_db)]
+DbSession = Annotated[Session, Depends(get_db)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
@@ -21,7 +21,7 @@ def _unauthorized(detail: str) -> HTTPException:
 
 
 def get_current_user(
-    db: DBSession,
+    db: DbSession,
     settings: SettingsDep,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> User:
