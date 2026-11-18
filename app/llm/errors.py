@@ -1,4 +1,7 @@
+"""Our own error types for LLM calls"""
+
 import math
+from typing import Any
 
 
 class LLMError(Exception):
@@ -61,3 +64,33 @@ class LLMTimeoutError(LLMError):
 
 class LLMConnectionError(LLMError):
     message = "The AI service could not be reached."
+
+
+class LLMNotConfigured(LLMError):
+    """No API key is set on this server: nothing was sent anywhere"""
+
+    message = "The AI service is not configured on this server."
+
+
+class LLMUnusableAnswerError(LLMError):
+    """The model answered, but the answer is not an itinerary we can store. `reason` is a short
+    code for logs (never the text of the answer)."""
+
+    message = "The AI service returned an itinerary we could not use. Please try again."
+
+    def __init__(self, reason: str = "unusable", **details) -> None:
+        super().__init__(**details)
+        self.reason = reason
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        # The extra `reason` must survive copy and pickle (a worker pool pickles errors).
+        return (
+            _rebuild_unusable,
+            (self.reason, self.request_id, self.status_code, self.retry_after),
+        )
+
+
+def _rebuild_unusable(reason, request_id, status_code, retry_after):
+    return LLMUnusableAnswerError(
+        reason, request_id=request_id, status_code=status_code, retry_after=retry_after
+    )
