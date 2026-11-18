@@ -1,0 +1,22 @@
+meta {
+  name: Generate itinerary
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/itineraries
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "trip_id": {{trip_id}}
+  }
+}
+
+docs {
+  No `days`: the model plans the trip and replaces any existing itinerary. Needs ANTHROPIC_API_KEY on the server.
+  201 with the plan. 422 if the trip is longer than 18 days. 409 if a generation for this trip is already running, the database is busy, or the trip was edited mid-generation. 404 if the trip is gone.
+}

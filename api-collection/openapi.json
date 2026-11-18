@@ -130,7 +130,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ]
       }
@@ -144,7 +144,7 @@
         "operationId": "create_trip_trips_post",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "requestBody": {
@@ -188,7 +188,7 @@
         "operationId": "list_trips_trips_get",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "parameters": [
@@ -254,7 +254,7 @@
         "operationId": "get_trip_trips__trip_id__get",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "parameters": [
@@ -301,7 +301,7 @@
         "operationId": "update_trip_trips__trip_id__put",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "parameters": [
@@ -358,7 +358,7 @@
         "operationId": "delete_trip_trips__trip_id__delete",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "parameters": [
@@ -397,6 +397,7 @@
           "itineraries"
         ],
         "summary": "Create Itinerary",
+        "description": "With `days`: store this manual itinerary (409 if the trip already has one). Without `days`:\nhave the model generate one, replacing any existing itinerary.",
         "operationId": "create_itinerary_itineraries_post",
         "requestBody": {
           "content": {
@@ -432,7 +433,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ]
       }
@@ -446,7 +447,7 @@
         "operationId": "get_itinerary_itineraries__trip_id__get",
         "security": [
           {
-            "HTTPBearer": []
+            "OAuth2PasswordBearer": []
           }
         ],
         "parameters": [
@@ -623,20 +624,26 @@
             "title": "Trip Id"
           },
           "days": {
-            "items": {
-              "$ref": "#/components/schemas/DayData"
-            },
-            "type": "array",
-            "maxItems": 60,
-            "minItems": 1,
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DayData"
+                },
+                "type": "array",
+                "maxItems": 60,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Days"
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "trip_id",
-          "days"
+          "trip_id"
         ],
         "title": "ItineraryCreate"
       },
@@ -935,9 +942,14 @@
       }
     },
     "securitySchemes": {
-      "HTTPBearer": {
-        "type": "http",
-        "scheme": "bearer"
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "auth/login"
+          }
+        }
       }
     }
   }

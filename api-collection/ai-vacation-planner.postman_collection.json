@@ -180,7 +180,21 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{baseUrl}}/itineraries", "host": ["{{baseUrl}}"], "path": ["itineraries"] },
-            "description": "409 if the trip already has one. 422 if a day number exceeds the trip's days. 1-20 activities per day, unique day numbers."
+            "description": "Manual: send `days` yourself. 409 if the trip already has one (Generate itinerary replaces instead). 422 if a day number exceeds the trip's days. 1-20 activities per day, unique day numbers."
+          }
+        },
+        {
+          "name": "Generate itinerary",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trip_id\": {{trip_id}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/itineraries", "host": ["{{baseUrl}}"], "path": ["itineraries"] },
+            "description": "No `days`: the model plans the trip and replaces any existing itinerary. Needs ANTHROPIC_API_KEY on the server. 201 with the plan. 422 if the trip is longer than 18 days. 409 if a generation for this trip is already running, the database is busy, or the trip was edited mid-generation. 404 if the trip is gone."
           }
         },
         {
